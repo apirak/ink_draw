@@ -19,7 +19,13 @@
       "Bash(curl -s http://localhost:8765/js/main.js)",
       "Bash(pkill -f \"http.server 8765\")",
       "Bash(mktemp /Users/apirak/workspace/bird/ai-handoff/handoff-XXXXXX.md)",
-      "Bash(mktemp:*)"
+      "Bash(mktemp:*)",
+      "Bash(curl -s http://localhost:5173/bird.html)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/bird.html)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://localhost:5174/bird.html)",
+      "Bash(:)",
+      "Bash(exit 1)",
+      "Bash(ls src/*.ts)"
     ]
   }
 }
