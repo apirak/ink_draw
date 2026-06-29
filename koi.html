@@ -6,6 +6,9 @@
 <title>墨の群れ</title>
 
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles.css">
 </head>
 <body data-mode="koi">
@@ -16,7 +19,7 @@
 <div class="vignette"></div>
 
 <header class="title" aria-hidden="true">
-  <div class="kanji">鯉</div>
+  <div class="kanji">鲤</div>
 </header>
 
 <div class="brush" id="brush"></div>
@@ -33,19 +36,7 @@
   <input type="range" id="sCoh" min="0" max="1.5" step="0.05">
   <div class="foot">FOV = visible arc; 360° sees all, lower carves a rear blind spot. <span class="reset" id="tnReset">reset mode</span></div>
 </aside>
-  <script src="src/js/setup.js"></script>
-  <script type="module" src="src/js/modes-adapter.js"></script>
-  <script type="module" src="src/js/agents-adapter.js"></script>
-  <script defer src="src/js/pointer.js"></script>
-  <script type="module" src="src/js/target-adapter.js"></script>
-  <script type="module" src="src/js/effects-adapter.js"></script>
-  <script type="module" src="src/js/brush-adapter.js"></script>
-  <script defer src="src/js/renderers.js"></script>
-  <script defer src="src/js/background.js"></script>
-  <script type="module" src="src/js/physics-adapter.js"></script>
-  <script defer src="src/js/trail.js"></script>
+  <script type="module" src="src/main.ts"></script>
   <script defer src="src/js/tuner.js"></script>
-  <script defer src="src/js/loop.js"></script>
-  <script defer src="src/js/koi-main.js"></script>
 </body>
 </html>
