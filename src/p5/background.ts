@@ -1,5 +1,5 @@
 import { INK, RED, SEPIA, type ModeName } from "../modes";
-import { SHD, SHP, SHK } from "../renderers";
+import { SHD, SHP, SHK } from "./renderers";
 import { dab, stroke } from "./brush";
 
 function vertexQuadratic(

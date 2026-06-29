@@ -8,6 +8,7 @@ function mockP(): any {
     clear: vi.fn(),
     ellipse: vi.fn(),
     fill: vi.fn(),
+    noStroke: vi.fn(),
     push: vi.fn(),
     pop: vi.fn(),
     translate: vi.fn(),
@@ -25,12 +26,12 @@ describe('paintTrail', () => {
     stamps.length = 0;
   });
 
-  it('creates a scaled graphics buffer and clears it each frame', () => {
+  it('creates a full-size graphics buffer and clears it each frame', () => {
     const p = mockP();
     const agents: any[] = [];
     paintTrail(p, 800, 600, MODES.birds, agents, 'birds');
 
-    expect(p.createGraphics).toHaveBeenCalledWith(400, 300);
+    expect(p.createGraphics).toHaveBeenCalledWith(800, 600);
     expect(p.g.clear).toHaveBeenCalled();
     expect(p.image).toHaveBeenCalled();
   });

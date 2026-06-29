@@ -105,7 +105,7 @@ describe('p5 main', () => {
     const backgroundLayer = graphics.find((g) => g.width === 1024 && g.height === 768);
     expect(backgroundLayer).toBeTruthy();
     expect(instance.image.mock.calls[0]).toEqual([backgroundLayer, 0, 0, 1024, 768]);
-    expect(instance.image.mock.calls[1][0].width).toBe(512);
-    expect(instance.image.mock.calls[1][0].height).toBe(384);
+    expect(instance.image.mock.calls[1][0].width).toBe(1024);
+    expect(instance.image.mock.calls[1][0].height).toBe(768);
   });
 });

@@ -6,8 +6,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: resolve(__dirname, 'index.html'),
-        bird: resolve(__dirname, 'bird.html'),
-        koi: resolve(__dirname, 'koi.html'),
+        bird: resolve(__dirname, 'bird_p5.html'),
+        koi: resolve(__dirname, 'koi_p5.html'),
       },
     },
   },
