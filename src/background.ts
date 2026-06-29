@@ -5,7 +5,7 @@ import { SHD, SHP, SHK } from './renderers';
 function washShape(
   ctx: CanvasRenderingContext2D,
   pts: [number, number][],
-  color: string,
+  color: string | CanvasGradient,
 ) {
   ctx.fillStyle = color;
   ctx.beginPath();
@@ -19,6 +19,138 @@ function washShape(
   ctx.fill();
 }
 
+function paperBase(
+  ctx: CanvasRenderingContext2D,
+  W: number,
+  H: number,
+) {
+  // aged silk/washi ground
+  ctx.fillStyle = '#f2ecdd';
+  ctx.fillRect(0, 0, W, H);
+
+  // subtle corner aging
+  const age = ctx.createRadialGradient(
+    W * 0.5,
+    H * 0.42,
+    Math.min(W, H) * 0.22,
+    W * 0.5,
+    H * 0.42,
+    Math.max(W, H) * 0.95,
+  );
+  age.addColorStop(0, 'rgba(218, 202, 174, 0)');
+  age.addColorStop(0.65, 'rgba(190, 168, 138, 0.06)');
+  age.addColorStop(1, 'rgba(160, 138, 112, 0.16)');
+  ctx.fillStyle = age;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function paperFiber(
+  ctx: CanvasRenderingContext2D,
+  W: number,
+  H: number,
+) {
+  let seed = 17;
+  const rnd = () =>
+    (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  ctx.save();
+  for (let i = 0; i < 3500; i++) {
+    const x = rnd() * W;
+    const y = rnd() * H;
+    const len = 2 + rnd() * 7;
+    const ang = rnd() * Math.PI * 2;
+    const alpha = 0.025 + rnd() * 0.045;
+    const warm = 118 + Math.floor(rnd() * 34);
+    ctx.strokeStyle = `rgba(${warm}, ${warm - 10}, ${warm - 22}, ${alpha})`;
+    ctx.lineWidth = 0.4 + rnd() * 0.6;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.cos(ang) * len, y + Math.sin(ang) * len);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function mountainLayer(
+  ctx: CanvasRenderingContext2D,
+  W: number,
+  H: number,
+  baseY: number,
+  amp: number,
+  alpha: number,
+  seed: number,
+) {
+  const rnd = () =>
+    (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  // 1D fractal ridge: layered sines create natural alternating peaks/valleys
+  const waves: { freq: number; phase: number; amp: number }[] = [];
+  let f = 0.0018 + rnd() * 0.0024;
+  let a = amp;
+  for (let i = 0; i < 4; i++) {
+    waves.push({ freq: f, phase: rnd() * Math.PI * 2, amp: a });
+    f *= 2.3;
+    a *= 0.5;
+  }
+  const ridge = (x: number) =>
+    waves.reduce((sum, w) => sum + Math.sin(x * w.freq + w.phase) * w.amp, 0);
+
+  const pts: [number, number][] = [
+    [-0.1 * W, H],
+    [-0.05 * W, baseY + ridge(-0.05 * W) * 0.65],
+  ];
+
+  const steps = 28;
+  for (let i = 0; i <= steps; i++) {
+    const x = (i / steps) * W;
+    pts.push([x, baseY + ridge(x)]);
+  }
+
+  pts.push([1.05 * W, baseY + ridge(1.05 * W) * 0.65]);
+  pts.push([1.1 * W, H * 1.2]);
+  pts.push([-0.1 * W, H * 1.2]);
+
+  const grad = ctx.createLinearGradient(0, baseY - amp, 0, H);
+  grad.addColorStop(0, INK(alpha * 0.2));
+  grad.addColorStop(0.5, INK(alpha));
+  grad.addColorStop(1, INK(alpha * 1.4));
+
+  washShape(ctx, pts, grad);
+}
+
+function drawSun(
+  ctx: CanvasRenderingContext2D,
+  W: number,
+  H: number,
+) {
+  const x = W * 0.78;
+  const y = H * 0.22;
+  const r = Math.min(W, H) * 0.11;
+
+  // soft vermilion glow
+  const glow = ctx.createRadialGradient(x, y, r * 0.15, x, y, r * 1.6);
+  glow.addColorStop(0, RED(0.82));
+  glow.addColorStop(0.35, RED(0.42));
+  glow.addColorStop(0.7, RED(0.12));
+  glow.addColorStop(1, RED(0));
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 1.6, 0, 7);
+  ctx.fill();
+
+  // core sun with watercolor edge
+  const core = ctx.createRadialGradient(x, y, 0, x, y, r);
+  core.addColorStop(0, RED(0.92));
+  core.addColorStop(0.75, RED(0.78));
+  core.addColorStop(0.92, RED(0.38));
+  core.addColorStop(1, RED(0));
+  ctx.fillStyle = core;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, 7);
+  ctx.fill();
+
+}
+
 export function drawBackground(
   ctx: CanvasRenderingContext2D,
   W: number,
@@ -28,37 +160,16 @@ export function drawBackground(
   ctx.clearRect(0, 0, W, H);
 
   if (mode === 'birds') {
-    washShape(
-      ctx,
-      [
-        [-0.1 * W, H],
-        [0.1 * W, 0.72 * H],
-        [0.3 * W, 0.86 * H],
-        [0.5 * W, 0.7 * H],
-        [0.72 * W, 0.88 * H],
-        [1.1 * W, 0.8 * H],
-        [1.1 * W, H * 1.2],
-        [-0.1 * W, H * 1.2],
-      ],
-      INK(0.06),
-    );
-    washShape(
-      ctx,
-      [
-        [-0.1 * W, H],
-        [0.18 * W, 0.82 * H],
-        [0.42 * W, 0.92 * H],
-        [0.78 * W, 0.84 * H],
-        [1.1 * W, 0.94 * H],
-        [1.1 * W, H * 1.2],
-        [-0.1 * W, H * 1.2],
-      ],
-      INK(0.05),
-    );
-    ctx.fillStyle = RED(0.78);
-    ctx.beginPath();
-    ctx.arc(W * 0.82, H * 0.2, Math.min(W, H) * 0.05, 0, 7);
-    ctx.fill();
+    paperBase(ctx, W, H);
+    paperFiber(ctx, W, H);
+
+    // distant mountains
+    mountainLayer(ctx, W, H, H * 0.68, H * 0.055, 0.045, 3);
+    mountainLayer(ctx, W, H, H * 0.74, H * 0.06, 0.06, 5);
+    mountainLayer(ctx, W, H, H * 0.82, H * 0.065, 0.085, 7);
+    mountainLayer(ctx, W, H, H * 0.9, H * 0.07, 0.11, 11);
+
+    drawSun(ctx, W, H);
   }
 
   if (mode === 'koi') {

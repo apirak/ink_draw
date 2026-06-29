@@ -49,6 +49,7 @@
     letter-spacing: .22em; line-height: 1;
     color: var(--ink);
   }
+
   .title .latin {
     writing-mode: vertical-rl;
     font-size: 12px; letter-spacing: .52em; text-transform: uppercase;
