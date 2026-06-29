@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>墨の群れ — The Ink Flock</title>
+  <script type="module" crossorigin src="/assets/index-Lzb0qquZ.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-8_0EBZHo.css">
+</head>
+<body data-mode="birds">
+<canvas id="bg"></canvas>
+<canvas id="trail"></canvas>
+<canvas id="main"></canvas>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<header class="title" aria-hidden="true">
+  <div class="kanji">墨の群れ</div>
+  <div class="latin">The Ink Flock</div>
+</header>
+
+<div class="subtitle" aria-hidden="true">
+  <b>Sumi-e in motion</b><br>
+  living ink follows your hand
+</div>
+
+<div class="hint" aria-hidden="true">move to lead the flock<br>press to scatter the ink<br><span style="opacity:.7">press T to tune the flock</span></div>
+<div class="hanko" aria-hidden="true">墨</div>
+<div class="brush" id="brush"></div>
+
+<nav class="dock" aria-label="Mode switcher">
+  <button class="mode" data-set="birds" aria-pressed="true">
+    <span class="seal">鳥</span>
+    <span class="name">Birds</span>
+  </button>
+  <button class="mode" data-set="koi" aria-pressed="false">
+    <span class="seal">鯉</span>
+    <span class="name">Koi</span>
+  </button>
+  <button class="mode" data-set="herd" aria-pressed="false">
+    <span class="seal">羚</span>
+    <span class="name">Herd</span>
+  </button>
+</nav>
+
+<aside class="tuner hidden" id="tuner" aria-label="Flocking tuner">
+  <h4><span>Flock tuner</span><span class="m" id="tnMode">birds</span></h4>
+  <label>Field of view <span class="v" id="vFov"></span></label>
+  <input type="range" id="sFov" min="120" max="360" step="5">
+  <label>Separation <span class="v" id="vSep"></span></label>
+  <input type="range" id="sSep" min="0" max="3" step="0.05">
+  <label>Alignment <span class="v" id="vAli"></span></label>
+  <input type="range" id="sAli" min="0" max="2" step="0.05">
+  <label>Cohesion <span class="v" id="vCoh"></span></label>
+  <input type="range" id="sCoh" min="0" max="1.5" step="0.05">
+  <div class="foot">FOV = visible arc; 360° sees all, lower carves a rear blind spot. <span class="reset" id="tnReset">reset mode</span></div>
+</aside>
+
+</body>
+</html>
