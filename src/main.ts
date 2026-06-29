@@ -3,9 +3,6 @@ import { makeAgent, reseed } from './agents';
 import { dab, stroke } from './brush';
 import { drawRipples, inkBurst } from './effects';
 import {
-  arcToCos,
-  cosToArc,
-  DEFAULTS,
   INK,
   KOI_BODY,
   KOI_GOLD,
@@ -23,6 +20,7 @@ import { update } from './physics';
 import { drawBird, drawKoi, drawHerd } from './renderers';
 import { drawBackground } from './background';
 import { paintTrail, stamps } from './trail';
+import { initTuner } from './tuner';
 import type { PointerState } from './target';
 
 /* ───────────────────────── canvas setup ───────────────────────── */
@@ -92,9 +90,6 @@ Object.assign(globalThis as any, {
   WATER_BLUE,
   KOI_KINDS,
   MODES,
-  DEFAULTS,
-  arcToCos,
-  cosToArc,
   stroke,
   dab,
   // runtime state
@@ -191,6 +186,7 @@ function init() {
   for (let i = 0; i < MAX; i++) agents.push(makeAgent(i, mode, bounds));
   reseed(agents, mode, M);
   ptr.lastMove = -1e5;
+  initTuner(mode, M);
   requestAnimationFrame(loop);
 }
 
