@@ -1,6 +1,6 @@
-import { dab, stroke } from './brush';
-import { INK, RED, SEPIA, type ModeName } from './modes';
-import { SHD, SHP, SHK } from './renderers';
+import { dab, stroke } from "./brush";
+import { INK, RED, SEPIA, type ModeName } from "./modes";
+import { SHD, SHP, SHK } from "./renderers";
 
 function washShape(
   ctx: CanvasRenderingContext2D,
@@ -19,13 +19,9 @@ function washShape(
   ctx.fill();
 }
 
-function paperBase(
-  ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-) {
+function paperBase(ctx: CanvasRenderingContext2D, W: number, H: number) {
   // aged silk/washi ground
-  ctx.fillStyle = '#f2ecdd';
+  ctx.fillStyle = "#f2ecdd";
   ctx.fillRect(0, 0, W, H);
 
   // subtle corner aging
@@ -37,21 +33,16 @@ function paperBase(
     H * 0.42,
     Math.max(W, H) * 0.95,
   );
-  age.addColorStop(0, 'rgba(218, 202, 174, 0)');
-  age.addColorStop(0.65, 'rgba(190, 168, 138, 0.06)');
-  age.addColorStop(1, 'rgba(160, 138, 112, 0.16)');
+  age.addColorStop(0, "rgba(218, 202, 174, 0)");
+  age.addColorStop(0.65, "rgba(190, 168, 138, 0.06)");
+  age.addColorStop(1, "rgba(160, 138, 112, 0.16)");
   ctx.fillStyle = age;
   ctx.fillRect(0, 0, W, H);
 }
 
-function paperFiber(
-  ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-) {
+function paperFiber(ctx: CanvasRenderingContext2D, W: number, H: number) {
   let seed = 17;
-  const rnd = () =>
-    (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
   ctx.save();
   for (let i = 0; i < 3500; i++) {
@@ -80,8 +71,7 @@ function mountainLayer(
   alpha: number,
   seed: number,
 ) {
-  const rnd = () =>
-    (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
   // 1D fractal ridge: layered sines create natural alternating peaks/valleys
   const waves: { freq: number; phase: number; amp: number }[] = [];
@@ -118,37 +108,16 @@ function mountainLayer(
   washShape(ctx, pts, grad);
 }
 
-function drawSun(
-  ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-) {
+function drawSun(ctx: CanvasRenderingContext2D, W: number, H: number) {
   const x = W * 0.78;
   const y = H * 0.22;
-  const r = Math.min(W, H) * 0.11;
+  const r = Math.min(W, H) * 0.08;
 
-  // soft vermilion glow
-  const glow = ctx.createRadialGradient(x, y, r * 0.15, x, y, r * 1.6);
-  glow.addColorStop(0, RED(0.82));
-  glow.addColorStop(0.35, RED(0.42));
-  glow.addColorStop(0.7, RED(0.12));
-  glow.addColorStop(1, RED(0));
-  ctx.fillStyle = glow;
-  ctx.beginPath();
-  ctx.arc(x, y, r * 1.6, 0, 7);
-  ctx.fill();
-
-  // core sun with watercolor edge
-  const core = ctx.createRadialGradient(x, y, 0, x, y, r);
-  core.addColorStop(0, RED(0.92));
-  core.addColorStop(0.75, RED(0.78));
-  core.addColorStop(0.92, RED(0.38));
-  core.addColorStop(1, RED(0));
-  ctx.fillStyle = core;
+  // simple flat sun — no glow, no watercolor edge
+  ctx.fillStyle = RED(0.9);
   ctx.beginPath();
   ctx.arc(x, y, r, 0, 7);
   ctx.fill();
-
 }
 
 export function drawBackground(
@@ -159,7 +128,7 @@ export function drawBackground(
 ): void {
   ctx.clearRect(0, 0, W, H);
 
-  if (mode === 'birds') {
+  if (mode === "birds") {
     paperBase(ctx, W, H);
     paperFiber(ctx, W, H);
 
@@ -172,7 +141,7 @@ export function drawBackground(
     drawSun(ctx, W, H);
   }
 
-  if (mode === 'koi') {
+  if (mode === "koi") {
     ctx.strokeStyle = INK(0.07);
     ctx.lineWidth = 1.2;
     for (let i = 0; i < 5; i++) {
@@ -191,15 +160,7 @@ export function drawBackground(
       [0.07, 0.24, 0.032],
     ] as const) {
       ctx.beginPath();
-      ctx.ellipse(
-        W * x,
-        H * y,
-        W * r,
-        W * r * 0.62,
-        0.3,
-        0.45,
-        6.1,
-      );
+      ctx.ellipse(W * x, H * y, W * r, W * r * 0.62, 0.3, 0.45, 6.1);
       ctx.lineTo(W * x, H * y);
       ctx.closePath();
       ctx.fill();
@@ -210,10 +171,9 @@ export function drawBackground(
     ctx.fill();
   }
 
-  if (mode === 'herd') {
+  if (mode === "herd") {
     let seed = 7;
-    const rnd = () =>
-      (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
     const wx = W * 0.2;
     const wy = H * 0.7;
@@ -222,10 +182,7 @@ export function drawBackground(
     for (let i = 0; i < 9; i++) {
       const ang = (i / 9) * Math.PI * 2;
       const r = wr * (0.7 + rnd() * 0.5);
-      pool.push([
-        wx + Math.cos(ang) * r * 1.25,
-        wy + Math.sin(ang) * r * 0.8,
-      ]);
+      pool.push([wx + Math.cos(ang) * r * 1.25, wy + Math.sin(ang) * r * 0.8]);
     }
     washShape(ctx, pool, INK(0.11));
     ctx.strokeStyle = INK(0.06);
@@ -275,16 +232,7 @@ export function drawBackground(
       const l = 4 + rnd() * 8;
       ctx.fillStyle = SEPIA(0.13 + rnd() * 0.1);
       stroke(ctx, x, y, x - 2, y - l * 0.6, x - 3 - rnd() * 3, y - l, 1.1);
-      stroke(
-        ctx,
-        x,
-        y,
-        x + 1,
-        y - l * 0.5,
-        x + 2 + rnd() * 3,
-        y - l * 0.85,
-        1,
-      );
+      stroke(ctx, x, y, x + 1, y - l * 0.5, x + 2 + rnd() * 3, y - l * 0.85, 1);
       stroke(
         ctx,
         x,

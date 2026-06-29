@@ -1,3 +1,5 @@
+export {};
+
 const brushEl = document.getElementById('brush')!;
 
 addEventListener(
