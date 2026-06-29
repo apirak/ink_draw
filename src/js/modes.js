@@ -44,6 +44,7 @@ const MODES = {
     trailFade: .016, stampA: .035,
     ink: INK
   },
+  // ponytail: herd mode remains in shared code but is not exposed on any page
   herd: {
     count: reduced ? 14 : 24,
     maxSpeed: 2.9, maxForce: .07,

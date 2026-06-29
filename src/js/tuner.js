@@ -1,25 +1,5 @@
 "use strict";
 
-/* ───────────────────────── mode switching ───────────────────────── */
-
-function setMode(next) {
-  if (next === mode) return;
-  mode = next; M = MODES[next];
-  document.body.dataset.mode = next;
-  morph = 0;                                         // ghost in
-  reseed();
-  // the old world's ink dries fast so the new one starts on clean paper
-  for (const s of stamps) s.life = Math.min(s.life, s.age + 24);
-  ripples.length = 0;
-  bgC.style.opacity = 0;
-  setTimeout(() => { drawBackground(); bgC.style.opacity = 1; }, 380);
-  for (const b of document.querySelectorAll('.mode'))
-    b.setAttribute('aria-pressed', String(b.dataset.set === next));
-  syncTuner();
-}
-for (const b of document.querySelectorAll('.mode'))
-  b.addEventListener('click', () => setMode(b.dataset.set));
-
 /* ───────────────────────── flock tuner ───────────────────────── */
 
 // snapshot the researched defaults so "reset mode" can restore them
@@ -54,7 +34,6 @@ els.coh.addEventListener('input', () => { M.cohW = +els.coh.value; els.vCoh.text
 document.getElementById('tnReset').addEventListener('click', () => { Object.assign(M, DEFAULTS[mode]); syncTuner(); });
 
 addEventListener('keydown', e => {
-  if (e.key === '1') setMode('birds');
   if (e.key === 't' || e.key === 'T') tuner.classList.toggle('hidden');
 });
 syncTuner();

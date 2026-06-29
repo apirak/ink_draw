@@ -27,11 +27,3 @@ function loop(t) {
   const draw = mode === 'birds' ? drawBird : mode === 'koi' ? drawKoi : drawHerd;
   for (const a of order) draw(a, t);
 }
-
-/* ───────────────────────── go ───────────────────────── */
-
-resize();
-for (let i = 0; i < MAX; i++) agents.push(makeAgent(i));
-reseed();
-ptr.lastMove = -1e5;                                  // start in self-wander until the hand arrives
-requestAnimationFrame(loop);

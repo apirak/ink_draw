@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>墨の群れ</title>
+
+
+  <link rel="stylesheet" crossorigin href="/assets/styles-DlnG9OpX.css">
+</head>
+<body data-mode="koi">
+<canvas id="bg"></canvas>
+<canvas id="trail"></canvas>
+<canvas id="main"></canvas>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<header class="title" aria-hidden="true">
+  <div class="kanji">鯉</div>
+</header>
+
+<div class="hanko" aria-hidden="true">鯉</div>
+<div class="brush" id="brush"></div>
+
+<aside class="tuner hidden" id="tuner" aria-label="Flocking tuner">
+  <h4><span>Flock tuner</span><span class="m" id="tnMode">koi</span></h4>
+  <label>Field of view <span class="v" id="vFov"></span></label>
+  <input type="range" id="sFov" min="120" max="360" step="5">
+  <label>Separation <span class="v" id="vSep"></span></label>
+  <input type="range" id="sSep" min="0" max="3" step="0.05">
+  <label>Alignment <span class="v" id="vAli"></span></label>
+  <input type="range" id="sAli" min="0" max="2" step="0.05">
+  <label>Cohesion <span class="v" id="vCoh"></span></label>
+  <input type="range" id="sCoh" min="0" max="1.5" step="0.05">
+  <div class="foot">FOV = visible arc; 360° sees all, lower carves a rear blind spot. <span class="reset" id="tnReset">reset mode</span></div>
+</aside>
+  <script src="src/js/setup.js"></script>
+  <script src="src/js/modes.js"></script>
+  <script src="src/js/agents.js"></script>
+  <script src="src/js/pointer.js"></script>
+  <script src="src/js/effects.js"></script>
+  <script src="src/js/brush.js"></script>
+  <script src="src/js/renderers.js"></script>
+  <script src="src/js/background.js"></script>
+  <script src="src/js/physics.js"></script>
+  <script src="src/js/trail.js"></script>
+  <script src="src/js/tuner.js"></script>
+  <script src="src/js/loop.js"></script>
+  <script src="src/js/koi-main.js"></script>
+</body>
+</html>
