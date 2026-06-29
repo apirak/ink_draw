@@ -20,9 +20,6 @@ function mockP(): any {
     beginShape: vi.fn(() => (shape.length = 0)),
     endShape: vi.fn(),
     vertex: vi.fn((x: number, y: number) => shape.push({ x, y })),
-    curveVertex: vi.fn((x: number, y: number) => shape.push({ x, y })),
-    quadraticVertex: vi.fn(),
-    bezierVertex: vi.fn(),
     push: vi.fn(),
     pop: vi.fn(),
     translate: vi.fn(),
@@ -57,6 +54,15 @@ describe('drawBackground', () => {
     expect(p.rect).toHaveBeenCalledWith(0, 0, 800, 600);
     expect(p.line).toHaveBeenCalled();
     expect(p.beginShape).toHaveBeenCalled();
+    expect(p.vertex).toHaveBeenCalled();
+  });
+
+  it('does not pass canvas gradients to p5 fill in birds mode', () => {
+    const p = mockP();
+    drawBackground(p, 800, 600, 'birds');
+    const fills = p.fill.mock.calls.map(([color]: [unknown]) => color);
+
+    expect(fills.some((color: unknown) => typeof color === 'object' && color !== null && 'addColorStop' in color)).toBe(false);
   });
 
   it('draws a simple flat sun in birds mode', () => {

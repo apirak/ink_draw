@@ -15,6 +15,7 @@ const DPR = Math.min(window.devicePixelRatio || 1, 2);
 new p5((p: any) => {
   let W = 0;
   let H = 0;
+  let bgLayer: any = null;
   const mode: ModeName = (document.body.dataset.mode as ModeName) ?? 'birds';
   const M: ModeConfig = MODES[mode];
   let morph = 1;
@@ -31,13 +32,19 @@ new p5((p: any) => {
 
   const brushEl = document.getElementById('brush')!;
 
+  function redrawBackground() {
+    bgLayer = p.createGraphics(W, H);
+    bgLayer.pixelDensity?.(DPR);
+    drawBackground(bgLayer, W, H, mode);
+  }
+
   function resize() {
     W = innerWidth;
     H = innerHeight;
     bounds.w = W;
     bounds.h = H;
     p.resizeCanvas(W, H);
-    drawBackground(p, W, H, mode);
+    redrawBackground();
   }
 
   p.setup = () => {
@@ -47,6 +54,7 @@ new p5((p: any) => {
     p.pixelDensity(DPR);
     bounds.w = W;
     bounds.h = H;
+    redrawBackground();
 
     for (let i = 0; i < MAX; i++) agents.push(makeAgent(i, mode, bounds));
     reseed(agents, mode, M);
@@ -102,9 +110,10 @@ new p5((p: any) => {
     morph = Math.min(morph + 0.022 * dt, 1);
 
     update(t, dt, mode, M, agents, bounds, ptr, performance.now());
-    paintTrail(p, W, H, M, agents, mode);
 
     p.clear();
+    if (bgLayer) p.image(bgLayer, 0, 0, W, H);
+    paintTrail(p, W, H, M, agents, mode);
     drawRipples(p, ripples);
 
     const order = agents.slice(0, M.count);

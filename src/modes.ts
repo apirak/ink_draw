@@ -66,7 +66,7 @@ export function buildModes(reduced: boolean): Record<ModeName, ModeConfig> {
       orbit: [26, 130],
       fov: -0.35,
       trailFade: 0.065,
-      stampA: 0.045,
+      stampA: 0.1,
       ink: INK,
     },
     koi: {

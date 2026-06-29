@@ -2,19 +2,38 @@ import { INK, RED, SEPIA, type ModeName } from "../modes";
 import { SHD, SHP, SHK } from "../renderers";
 import { dab, stroke } from "./brush";
 
-function washShape(
+function vertexQuadratic(
   p: any,
-  pts: [number, number][],
-  color: any,
+  x0: number,
+  y0: number,
+  cx: number,
+  cy: number,
+  x1: number,
+  y1: number,
+  steps = 5,
 ) {
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const mt = 1 - t;
+    p.vertex(
+      mt * mt * x0 + 2 * mt * t * cx + t * t * x1,
+      mt * mt * y0 + 2 * mt * t * cy + t * t * y1,
+    );
+  }
+}
+
+function washShape(p: any, pts: [number, number][], color: string) {
   p.fill(color);
   p.noStroke();
   p.beginShape();
   p.vertex(pts[0][0], pts[0][1]);
+  let [x0, y0] = pts[0];
   for (let i = 1; i < pts.length - 1; i++) {
     const xc = (pts[i][0] + pts[i + 1][0]) / 2;
     const yc = (pts[i][1] + pts[i + 1][1]) / 2;
-    p.quadraticVertex(pts[i][0], pts[i][1], xc, yc);
+    vertexQuadratic(p, x0, y0, pts[i][0], pts[i][1], xc, yc);
+    x0 = xc;
+    y0 = yc;
   }
   p.endShape(p.CLOSE);
 }
@@ -22,20 +41,7 @@ function washShape(
 function paperBase(p: any, W: number, H: number) {
   p.background("#f2ecdd");
   p.noStroke();
-
-  const ctx = p.drawingContext;
-  const age = ctx.createRadialGradient(
-    W * 0.5,
-    H * 0.42,
-    Math.min(W, H) * 0.22,
-    W * 0.5,
-    H * 0.42,
-    Math.max(W, H) * 0.95,
-  );
-  age.addColorStop(0, "rgba(218, 202, 174, 0)");
-  age.addColorStop(0.65, "rgba(190, 168, 138, 0.06)");
-  age.addColorStop(1, "rgba(160, 138, 112, 0.16)");
-  p.fill(age);
+  p.fill("rgba(160, 138, 112, 0.08)");
   p.rect(0, 0, W, H);
 }
 
@@ -98,13 +104,7 @@ function mountainLayer(
   pts.push([1.1 * W, H * 1.2]);
   pts.push([-0.1 * W, H * 1.2]);
 
-  const ctx = p.drawingContext;
-  const grad = ctx.createLinearGradient(0, baseY - amp, 0, H);
-  grad.addColorStop(0, INK(alpha * 0.2));
-  grad.addColorStop(0.5, INK(alpha));
-  grad.addColorStop(1, INK(alpha * 1.4));
-
-  washShape(p, pts, grad);
+  washShape(p, pts, INK(alpha));
 }
 
 function drawSun(p: any, W: number, H: number) {

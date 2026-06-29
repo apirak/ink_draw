@@ -31,8 +31,8 @@ export function paintTrail(
 ): void {
   frame++;
 
-  const sw = Math.floor(W * 0.5);
-  const sh = Math.floor(H * 0.5);
+  const sw = W;
+  const sh = H;
   if (!g || g.width !== sw || g.height !== sh) {
     g = p.createGraphics(sw, sh);
   }
@@ -85,6 +85,7 @@ export function paintTrail(
   }
 
   g.clear();
+  g.noStroke();
   for (let i = stamps.length - 1; i >= 0; i--) {
     const s = stamps[i];
     s.age++;

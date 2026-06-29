@@ -1,3 +1,23 @@
+function vertexQuadratic(
+  p: any,
+  x0: number,
+  y0: number,
+  cx: number,
+  cy: number,
+  x1: number,
+  y1: number,
+  steps = 6,
+): void {
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const mt = 1 - t;
+    p.vertex(
+      mt * mt * x0 + 2 * mt * t * cx + t * t * x1,
+      mt * mt * y0 + 2 * mt * t * cy + t * t * y1,
+    );
+  }
+}
+
 export function stroke(
   p: any,
   x1: number,
@@ -14,13 +34,19 @@ export function stroke(
   const nx = (-dy / len) * w;
   const ny = (dx / len) * w;
 
-  const ctx = p.drawingContext as CanvasRenderingContext2D;
-  ctx.beginPath();
-  ctx.moveTo(x1 - nx, y1 - ny);
-  ctx.quadraticCurveTo(cpx, cpy, x2, y2);
-  ctx.quadraticCurveTo(cpx + nx * 0.35, cpy + ny * 0.35, x1 + nx, y1 + ny);
-  ctx.closePath();
-  ctx.fill();
+  p.beginShape();
+  p.vertex(x1 - nx, y1 - ny);
+  vertexQuadratic(p, x1 - nx, y1 - ny, cpx, cpy, x2, y2);
+  vertexQuadratic(
+    p,
+    x2,
+    y2,
+    cpx + nx * 0.35,
+    cpy + ny * 0.35,
+    x1 + nx,
+    y1 + ny,
+  );
+  p.endShape(p.CLOSE);
 }
 
 export function dab(
