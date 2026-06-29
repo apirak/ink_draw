@@ -20,18 +20,20 @@ Goal: incrementally migrate the Ink Flock canvas simulation from global-script J
 3. `src/brush.ts` (+ `src/brush.test.ts`, 4 tests passing)
    - `stroke(ctx, ...)`, `dab(ctx, ...)`.
    - Pure canvas helpers; mocked 2D context in tests.
+4. `src/effects.ts` (+ `src/effects.test.ts`, 15 tests passing)
+   - `inkBurst`, `waterRipple`, `drawRipples` with explicit parameters and pluggable randomness.
+   - `Stamp` and `Ripple` types exported for later renderers/trail module.
 
 ### Verification
-- `pnpm test` passes (39 tests).
+- `pnpm test` passes (54 tests).
 - `pnpm exec tsc --noEmit` passes.
 - Old JS files in `src/js/` remain untouched; HTML pages still load them with `<script>` tags.
 
 ## Next step (from user)
 Continue the next vertical slice. The obvious candidates, in dependency order:
-1. **Effects** (`src/js/effects.js` → `src/effects.ts` + tests). `inkBurst`, `waterRipple`, `drawRipples`. Needs `Agent`, `ModeName`, color factories, and pluggable randomness.
-2. **Target/pointer logic** (`src/js/pointer.js` → `src/target.ts`). Extract `targetPoint` to be deterministic.
-3. **Physics** (`src/js/physics.js` → `src/physics.ts`). Largest and highest-value module to test.
-4. **Background / renderers** after brush helpers are in place.
+1. **Target/pointer logic** (`src/js/pointer.js` → `src/target.ts`). Extract `targetPoint` to be deterministic.
+2. **Physics** (`src/js/physics.js` → `src/physics.ts`). Largest and highest-value module to test.
+3. **Background / renderers** after target and physics are in place.
 
 ## Suggested skills for next session
 - `/tdd` — workflow is tracer bullets, one test → one implementation.
