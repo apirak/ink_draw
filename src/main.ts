@@ -65,7 +65,7 @@ addEventListener('resize', resize);
 export const mode: ModeName = (document.body.dataset.mode as ModeName) ?? 'birds';
 export const M: ModeConfig = MODES[mode];
 export let morph = 1;
-export const MAX = MODES.birds.count;
+export const MAX = 110;
 export const agents: Agent[] = [];
 export const ripples: { x: number; y: number; r: number; max: number; a?: number; tint?: (a: number) => string }[] = [];
 export const bounds = { w: W, h: H };
@@ -186,7 +186,7 @@ function init() {
   for (let i = 0; i < MAX; i++) agents.push(makeAgent(i, mode, bounds));
   reseed(agents, mode, M);
   ptr.lastMove = -1e5;
-  initTuner(mode, M);
+  initTuner(mode, M, agents.length);
   requestAnimationFrame(loop);
 }
 

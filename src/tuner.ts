@@ -8,6 +8,8 @@ import {
 
 export interface TunerElements {
   mode: HTMLElement;
+  count: HTMLInputElement;
+  vCount: HTMLElement;
   fov: HTMLInputElement;
   vFov: HTMLElement;
   sep: HTMLInputElement;
@@ -18,10 +20,16 @@ export interface TunerElements {
   vCoh: HTMLElement;
 }
 
-export function initTuner(mode: ModeName, M: ModeConfig) {
+export function initTuner(
+  mode: ModeName,
+  M: ModeConfig,
+  maxCount: number,
+) {
   const tuner = document.getElementById('tuner')!;
   const els: TunerElements = {
     mode: document.getElementById('tnMode')!,
+    count: document.getElementById('sCount') as HTMLInputElement,
+    vCount: document.getElementById('vCount')!,
     fov: document.getElementById('sFov') as HTMLInputElement,
     vFov: document.getElementById('vFov')!,
     sep: document.getElementById('sSep') as HTMLInputElement,
@@ -32,8 +40,12 @@ export function initTuner(mode: ModeName, M: ModeConfig) {
     vCoh: document.getElementById('vCoh')!,
   };
 
+  els.count.max = String(maxCount);
+
   function syncTuner() {
     els.mode.textContent = mode;
+    els.count.value = String(Math.min(M.count, maxCount));
+    els.vCount.textContent = els.count.value;
     els.fov.value = String(cosToArc(M.fov));
     els.vFov.textContent = els.fov.value + '°';
     els.sep.value = String(M.sepW);
@@ -44,6 +56,10 @@ export function initTuner(mode: ModeName, M: ModeConfig) {
     els.vCoh.textContent = M.cohW.toFixed(2);
   }
 
+  els.count.addEventListener('input', () => {
+    M.count = Math.min(maxCount, Math.max(1, +els.count.value));
+    els.vCount.textContent = String(M.count);
+  });
   els.fov.addEventListener('input', () => {
     M.fov = arcToCos(+els.fov.value);
     els.vFov.textContent = els.fov.value + '°';
@@ -63,6 +79,7 @@ export function initTuner(mode: ModeName, M: ModeConfig) {
 
   document.getElementById('tnReset')!.addEventListener('click', () => {
     Object.assign(M, DEFAULTS[mode]);
+    M.count = Math.min(maxCount, M.count);
     syncTuner();
   });
 

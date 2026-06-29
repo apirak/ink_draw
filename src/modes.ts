@@ -53,7 +53,7 @@ export const cosToArc = (c: number): number => Math.round(Math.acos(Math.max(-1,
 export function buildModes(reduced: boolean): Record<ModeName, ModeConfig> {
   return {
     birds: {
-      count: reduced ? 60 : 110,
+      count: reduced ? 24 : 40,
       maxSpeed: 3.6,
       maxForce: 0.085,
       sepR: 24,
@@ -70,7 +70,7 @@ export function buildModes(reduced: boolean): Record<ModeName, ModeConfig> {
       ink: INK,
     },
     koi: {
-      count: reduced ? 16 : 26,
+      count: reduced ? 10 : 15,
       maxSpeed: 2.5,
       maxForce: 0.055,
       sepR: 76,
@@ -112,10 +112,10 @@ const reduced =
 
 export const MODES = buildModes(reduced);
 
-export type DefaultTunings = Pick<ModeConfig, 'fov' | 'sepW' | 'aliW' | 'cohW'>;
+export type DefaultTunings = Pick<ModeConfig, 'count' | 'fov' | 'sepW' | 'aliW' | 'cohW'>;
 
 export const DEFAULTS: Record<ModeName, DefaultTunings> = {
-  birds: { fov: MODES.birds.fov, sepW: MODES.birds.sepW, aliW: MODES.birds.aliW, cohW: MODES.birds.cohW },
-  koi: { fov: MODES.koi.fov, sepW: MODES.koi.sepW, aliW: MODES.koi.aliW, cohW: MODES.koi.cohW },
-  herd: { fov: MODES.herd.fov, sepW: MODES.herd.sepW, aliW: MODES.herd.aliW, cohW: MODES.herd.cohW },
+  birds: { count: MODES.birds.count, fov: MODES.birds.fov, sepW: MODES.birds.sepW, aliW: MODES.birds.aliW, cohW: MODES.birds.cohW },
+  koi: { count: MODES.koi.count, fov: MODES.koi.fov, sepW: MODES.koi.sepW, aliW: MODES.koi.aliW, cohW: MODES.koi.cohW },
+  herd: { count: MODES.herd.count, fov: MODES.herd.fov, sepW: MODES.herd.sepW, aliW: MODES.herd.aliW, cohW: MODES.herd.cohW },
 };

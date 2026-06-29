@@ -33,7 +33,7 @@ export function update(
   pointer: PointerState,
   now: number,
 ): void {
-  const N = M.count;
+  const N = Math.min(M.count, agents.length);
   const [tx, ty] = targetPoint(pointer, bounds, t, now);
   const sepR2 = M.sepR * M.sepR;
   const aliR2 = M.aliR * M.aliR;

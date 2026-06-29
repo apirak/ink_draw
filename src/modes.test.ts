@@ -77,6 +77,7 @@ describe('MODES', () => {
   it('records default tunings for reset', () => {
     for (const name of Object.keys(MODES) as Array<keyof typeof MODES>) {
       expect(DEFAULTS[name]).toEqual({
+        count: MODES[name].count,
         fov: MODES[name].fov,
         sepW: MODES[name].sepW,
         aliW: MODES[name].aliW,
@@ -86,8 +87,8 @@ describe('MODES', () => {
   });
 
   it('uses full counts when reduced motion is off', () => {
-    expect(MODES.birds.count).toBe(110);
-    expect(MODES.koi.count).toBe(26);
+    expect(MODES.birds.count).toBe(40);
+    expect(MODES.koi.count).toBe(15);
     expect(MODES.herd.count).toBe(24);
   });
 });
@@ -95,8 +96,8 @@ describe('MODES', () => {
 describe('reduced motion', () => {
   it('lowers agent counts', () => {
     const reduced = buildModes(true);
-    expect(reduced.birds.count).toBe(60);
-    expect(reduced.koi.count).toBe(16);
+    expect(reduced.birds.count).toBe(24);
+    expect(reduced.koi.count).toBe(10);
     expect(reduced.herd.count).toBe(14);
   });
 });
