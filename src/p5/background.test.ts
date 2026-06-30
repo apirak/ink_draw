@@ -1,4 +1,39 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// ponytail: stub p5.brush — WebGL lib inits only in real browser
+vi.mock('p5.brush', () => ({
+  instance: vi.fn(),
+  load: vi.fn(),
+  scaleBrushes: vi.fn(),
+  set: vi.fn(),
+  pick: vi.fn(),
+  stroke: vi.fn(),
+  strokeWeight: vi.fn(),
+  noStroke: vi.fn(),
+  fill: vi.fn(),
+  noFill: vi.fn(),
+  wash: vi.fn(),
+  noWash: vi.fn(),
+  fillBleed: vi.fn(),
+  fillTexture: vi.fn(),
+  hatch: vi.fn(),
+  noHatch: vi.fn(),
+  noField: vi.fn(),
+  field: vi.fn(),
+  wiggle: vi.fn(),
+  line: vi.fn(),
+  flowLine: vi.fn(),
+  rect: vi.fn(),
+  circle: vi.fn(),
+  arc: vi.fn(),
+  polygon: vi.fn(),
+  spline: vi.fn(),
+  beginShape: vi.fn(),
+  vertex: vi.fn(),
+  endShape: vi.fn(),
+}));
+
+import * as brush from 'p5.brush';
 import { drawBackground } from './background';
 
 function mockP(): any {
@@ -17,6 +52,8 @@ function mockP(): any {
     line: vi.fn(),
     circle: vi.fn(),
     ellipse: vi.fn(),
+    arc: vi.fn(),
+    PIE: 'pie',
     beginShape: vi.fn(() => (shape.length = 0)),
     endShape: vi.fn(),
     vertex: vi.fn((x: number, y: number) => shape.push({ x, y })),
@@ -26,6 +63,7 @@ function mockP(): any {
     rotate: vi.fn(),
     applyMatrix: vi.fn(),
     CLOSE: 'close',
+    WEBGL: 'webgl',
     color: vi.fn((r: number, g?: number, b?: number, a?: number) => ({ r, g, b, a })),
     lerpColor: vi.fn((a: any, b: any, t: number) => ({ a, b, t })),
     createGraphics: vi.fn(() => mockP()),
@@ -40,6 +78,10 @@ function gradient() {
   return { addColorStop: vi.fn() };
 }
 
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
 describe('drawBackground', () => {
   it('clears the full canvas', () => {
     const p = mockP();
@@ -47,28 +89,27 @@ describe('drawBackground', () => {
     expect(p.clear).toHaveBeenCalledTimes(1);
   });
 
-  it('paints the paper base and mountains in birds mode', () => {
+  it('paints the paper base for birds mode', () => {
     const p = mockP();
     drawBackground(p, 800, 600, 'birds');
-    expect(p.background).toHaveBeenCalled();
-    expect(p.rect).toHaveBeenCalledWith(0, 0, 800, 600);
-    expect(p.line).toHaveBeenCalled();
-    expect(p.beginShape).toHaveBeenCalled();
-    expect(p.vertex).toHaveBeenCalled();
+    expect(p.background).toHaveBeenCalledWith('#f2ecdd');
+    expect(p.translate).toHaveBeenCalledWith(-400, -300);
   });
 
-  it('does not pass canvas gradients to p5 fill in birds mode', () => {
+  it('paints four mountain layers and a sun circle via p5.brush in birds mode', () => {
     const p = mockP();
     drawBackground(p, 800, 600, 'birds');
-    const fills = p.fill.mock.calls.map(([color]: [unknown]) => color);
-
-    expect(fills.some((color: unknown) => typeof color === 'object' && color !== null && 'addColorStop' in color)).toBe(false);
+    expect(brush.polygon).toHaveBeenCalledTimes(4);
+    expect(brush.fill).toHaveBeenCalledWith('#2b2723', expect.any(Number));
+    expect(brush.fillTexture).toHaveBeenCalled();
+    expect(brush.circle).toHaveBeenCalledTimes(1);
+    expect(brush.circle).toHaveBeenCalledWith(800 * 0.78, 600 * 0.22, expect.any(Number));
   });
 
-  it('draws a simple flat sun in birds mode', () => {
+  it('does not call canvas gradients in birds mode', () => {
     const p = mockP();
     drawBackground(p, 800, 600, 'birds');
-    expect(p.circle).toHaveBeenCalled();
+    expect(p.fill).not.toHaveBeenCalled();
   });
 
   it('draws koi water ripples and pads in koi mode', () => {

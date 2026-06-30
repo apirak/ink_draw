@@ -1,5 +1,37 @@
 import { describe, expect, it, vi } from 'vitest';
 
+const brushStub = () => ({
+  instance: vi.fn(),
+  load: vi.fn(),
+  scaleBrushes: vi.fn(),
+  set: vi.fn(),
+  pick: vi.fn(),
+  stroke: vi.fn(),
+  strokeWeight: vi.fn(),
+  noStroke: vi.fn(),
+  fill: vi.fn(),
+  noFill: vi.fn(),
+  wash: vi.fn(),
+  noWash: vi.fn(),
+  fillBleed: vi.fn(),
+  fillTexture: vi.fn(),
+  hatch: vi.fn(),
+  noHatch: vi.fn(),
+  noField: vi.fn(),
+  field: vi.fn(),
+  wiggle: vi.fn(),
+  line: vi.fn(),
+  flowLine: vi.fn(),
+  rect: vi.fn(),
+  circle: vi.fn(),
+  arc: vi.fn(),
+  polygon: vi.fn(),
+  spline: vi.fn(),
+  beginShape: vi.fn(),
+  vertex: vi.fn(),
+  endShape: vi.fn(),
+});
+
 function mountDom() {
   document.body.innerHTML = '<div id="p5-host"></div><div id="tuner"><span id="tnMode"></span><input id="sCount"><input id="sFov"><span id="vCount"></span><span id="vFov"></span><input id="sSep"><span id="vSep"></span><input id="sAli"><span id="vAli"></span><input id="sCoh"><span id="vCoh"></span><span id="tnReset"></span></div><div id="brush"></div>';
 }
@@ -72,6 +104,7 @@ describe('p5 main', () => {
     });
 
     vi.doMock('p5', () => ({ default: mockP5 }));
+    vi.doMock('p5.brush', brushStub);
     await import('./main');
 
     expect(createCanvas).toHaveBeenCalled();
@@ -102,6 +135,7 @@ describe('p5 main', () => {
     });
 
     vi.doMock('p5', () => ({ default: mockP5 }));
+    vi.doMock('p5.brush', brushStub);
     await import('./main');
 
     instance.draw();

@@ -11,6 +11,9 @@ importers:
       p5:
         specifier: ^2.3.0
         version: 2.3.0
+      p5.brush:
+        specifier: 2.1.9-beta
+        version: 2.1.9-beta(p5@2.3.0)
     devDependencies:
       '@types/p5':
         specifier: ^1.7.7
@@ -655,6 +658,11 @@ packages:
   omggif@1.0.10:
     resolution: {integrity: sha512-LMJTtvgc/nugXj0Vcrrs68Mn2D1r0zf630VNtqtpI1FEO7e+O9FP4gqs9AcnBaSEeoHIPm28u6qgPR0oyEpGSw==}
 
+  p5.brush@2.1.9-beta:
+    resolution: {integrity: sha512-xFDaFs4jQID7FZf/rFiSRGKDiSncq4Avaa+m9YJfmaIyLmR8NdkwWBsBjRVoi0/vT8rVl5VN1jp++lnJy3vKQA==}
+    peerDependencies:
+      p5: ^2.2
+
   p5@2.3.0:
     resolution: {integrity: sha512-akBaN7KbLo5Y6fQ6xJ3w5KKVSfkHGLmqxkJZ7IwZkKw7QlEuVFlLuFTkx9/5o8AAyuJttzucXh7aWk2natRNMA==}
 
@@ -710,6 +718,9 @@ packages:
   signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
+
+  simplex-noise@4.0.3:
+    resolution: {integrity: sha512-qSE2I4AngLQG7BXqoZj51jokT4WUXe8mOBrvfOXpci8+6Yu44+/dD5zqDpOx3Ux792eamTd2lLcI8jqFntk/lg==}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -1378,6 +1389,11 @@ snapshots:
 
   omggif@1.0.10: {}
 
+  p5.brush@2.1.9-beta(p5@2.3.0):
+    dependencies:
+      p5: 2.3.0
+      simplex-noise: 4.0.3
+
   p5@2.3.0:
     dependencies:
       '@davepagurek/bezier-path': 0.0.7
@@ -1459,6 +1475,8 @@ snapshots:
   siginfo@2.0.0: {}
 
   signal-exit@4.1.0: {}
+
+  simplex-noise@4.0.3: {}
 
   source-map-js@1.2.1: {}
 

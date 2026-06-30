@@ -1,4 +1,5 @@
 import p5 from 'p5';
+import * as brush from 'p5.brush';
 import type { Agent } from '../agents';
 import { makeAgent, reseed } from '../agents';
 import { drawBackground } from './background';
@@ -34,9 +35,19 @@ new p5((p: any) => {
   const brushEl = document.getElementById('brush')!;
 
   function redrawBackground() {
-    bgLayer = p.createGraphics(W, H);
-    bgLayer.pixelDensity?.(DPR);
-    drawBackground(bgLayer, W, H, mode);
+    if (mode === 'birds') {
+      // ponytail: WEBGL p5.Graphics so p5.brush addon inits; main canvas stays 2D for koi clip path
+      bgLayer = p.createGraphics(W, H, p.WEBGL);
+      bgLayer.pixelDensity?.(DPR);
+      brush.load(bgLayer);
+      brush.scaleBrushes(6);
+      drawBackground(bgLayer, W, H, mode);
+      brush.load();
+    } else {
+      bgLayer = p.createGraphics(W, H);
+      bgLayer.pixelDensity?.(DPR);
+      drawBackground(bgLayer, W, H, mode);
+    }
   }
 
   function resize() {
@@ -51,7 +62,11 @@ new p5((p: any) => {
   p.setup = () => {
     W = innerWidth;
     H = innerHeight;
-    p.createCanvas(W, H).parent('p5-host');
+    // ponytail: p5.brush needs the main p5 instance on a WEBGL canvas;
+    // birds uses WEBGL, koi/herd stay 2D for drawingContext.clip paths
+    const isWebgl = mode === 'birds';
+    if (isWebgl) brush.instance(p);
+    p.createCanvas(W, H, isWebgl ? p.WEBGL : p.P2D).parent('p5-host');
     p.pixelDensity(DPR);
     bounds.w = W;
     bounds.h = H;
@@ -110,6 +125,9 @@ new p5((p: any) => {
     let dt = (t - last) / 16.667;
     last = t;
     if (dt > 3) dt = 3;
+
+    // WEBGL main: origin center → shift to top-left so all existing coords apply
+    if (mode === 'birds') p.translate(-W / 2, -H / 2);
 
     morph = Math.min(morph + 0.022 * dt, 1);
 

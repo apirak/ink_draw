@@ -1,6 +1,7 @@
 import { INK, RED, SEPIA, type ModeName } from "../modes";
 import { SHD, SHP, SHK } from "./renderers";
 import { dab, stroke } from "./brush";
+import * as brush from "p5.brush";
 
 function vertexQuadratic(
   p: any,
@@ -38,82 +39,37 @@ function washShape(p: any, pts: [number, number][], color: string) {
   p.endShape(p.CLOSE);
 }
 
-function paperBase(p: any, W: number, H: number) {
-  p.background("#f2ecdd");
-  p.noStroke();
-  p.fill("rgba(160, 138, 112, 0.08)");
-  p.rect(0, 0, W, H);
-}
-
-function paperFiber(p: any, W: number, H: number) {
-  let seed = 17;
-  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-
-  for (let i = 0; i < 3500; i++) {
-    const x = rnd() * W;
-    const y = rnd() * H;
-    const len = 2 + rnd() * 7;
-    const ang = rnd() * Math.PI * 2;
-    const alpha = 0.025 + rnd() * 0.045;
-    const warm = 118 + Math.floor(rnd() * 34);
-    p.stroke(`rgba(${warm}, ${warm - 10}, ${warm - 22}, ${alpha})`);
-    p.strokeWeight(0.4 + rnd() * 0.6);
-    p.line(
-      x,
-      y,
-      x + Math.cos(ang) * len,
-      y + Math.sin(ang) * len,
-    );
-  }
-}
-
-function mountainLayer(
-  p: any,
+// ponytail: deterministic ridge so peaks read as silhouettes — brush watercolor does the texture
+function ridgePoints(
   W: number,
   H: number,
   baseY: number,
   amp: number,
-  alpha: number,
+  freq: number,
   seed: number,
-) {
-  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+): [number, number][] {
+  let s = seed;
+  const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
 
-  const waves: { freq: number; phase: number; amp: number }[] = [];
-  let f = 0.0018 + rnd() * 0.0024;
+  const waves: { f: number; ph: number; a: number }[] = [];
+  let f = freq;
   let a = amp;
   for (let i = 0; i < 4; i++) {
-    waves.push({ freq: f, phase: rnd() * Math.PI * 2, amp: a });
+    waves.push({ f, ph: rnd() * Math.PI * 2, a });
     f *= 2.3;
     a *= 0.5;
   }
   const ridge = (x: number) =>
-    waves.reduce((sum, w) => sum + Math.sin(x * w.freq + w.phase) * w.amp, 0);
+    waves.reduce((sum, w) => sum + Math.sin(x * w.f + w.ph) * w.a, 0);
 
-  const pts: [number, number][] = [
-    [-0.1 * W, H],
-    [-0.05 * W, baseY + ridge(-0.05 * W) * 0.65],
-  ];
-
-  const steps = 28;
+  const pts: [number, number][] = [[-0.05 * W, H * 1.2]];
+  const steps = 32;
   for (let i = 0; i <= steps; i++) {
     const x = (i / steps) * W;
     pts.push([x, baseY + ridge(x)]);
   }
-
-  pts.push([1.05 * W, baseY + ridge(1.05 * W) * 0.65]);
-  pts.push([1.1 * W, H * 1.2]);
-  pts.push([-0.1 * W, H * 1.2]);
-
-  washShape(p, pts, INK(alpha));
-}
-
-function drawSun(p: any, W: number, H: number) {
-  const x = W * 0.78;
-  const y = H * 0.22;
-  const r = Math.min(W, H) * 0.08;
-  p.noStroke();
-  p.fill(RED(0.9));
-  p.circle(x, y, r * 2);
+  pts.push([1.05 * W, H * 1.2]);
+  return pts;
 }
 
 export function drawBackground(
@@ -125,13 +81,38 @@ export function drawBackground(
   p.clear();
 
   if (mode === "birds") {
-    paperBase(p, W, H);
-    paperFiber(p, W, H);
-    mountainLayer(p, W, H, H * 0.68, H * 0.055, 0.045, 3);
-    mountainLayer(p, W, H, H * 0.74, H * 0.06, 0.06, 5);
-    mountainLayer(p, W, H, H * 0.82, H * 0.065, 0.085, 7);
-    mountainLayer(p, W, H, H * 0.9, H * 0.07, 0.11, 11);
-    drawSun(p, W, H);
+    // p is a WEBGL p5.Graphics — origin at center; shift so existing top-left coords apply
+    p.background("#f2ecdd");
+    p.push();
+    p.translate(-W / 2, -H / 2);
+
+    // ponytail: pen brush — clean long line, no dot scatter; bold watercolor fill carries the body
+    brush.set("pen", "#2b2723", 2.5);
+    brush.noField();
+
+    // mountains far → near, fill only — no outline
+    brush.noStroke();
+    const layers = [
+      { baseY: H * 0.68, amp: H * 0.055, alpha: 60, seed: 3, freq: 0.0022 },
+      { baseY: H * 0.74, amp: H * 0.06, alpha: 80, seed: 5, freq: 0.0026 },
+      { baseY: H * 0.82, amp: H * 0.065, alpha: 110, seed: 7, freq: 0.003 },
+      { baseY: H * 0.9, amp: H * 0.07, alpha: 150, seed: 11, freq: 0.0034 },
+    ] as const;
+    for (const L of layers) {
+      const pts = ridgePoints(W, H, L.baseY, L.amp, L.freq, L.seed);
+      brush.fill("#2b2723", L.alpha);
+      brush.fillTexture(0.55, 0.45, false);
+      brush.polygon(pts);
+    }
+
+    // sun — pen circle with bold red fill, smooth edge
+    brush.set("pen", "#b0392a", 2.5);
+    brush.fill("#b0392a", 200);
+    brush.fillTexture(0.5, 0.45, false);
+    brush.circle(W * 0.78, H * 0.22, Math.min(W, H) * 0.08);
+
+    p.pop();
+    return;
   }
 
   if (mode === "koi") {
@@ -156,10 +137,7 @@ export function drawBackground(
       p.push();
       p.translate(W * x, H * y);
       p.rotate(0.3);
-      p.beginShape();
-      p.ellipse(0, 0, W * r * 2, W * r * 2 * 0.62);
-      p.vertex(0, 0);
-      p.endShape(p.CLOSE);
+      p.arc(0, 0, W * r * 2, W * r * 2 * 0.62, 0.45, 6.1, p.PIE);
       p.pop();
     }
     p.fill(RED(0.5));

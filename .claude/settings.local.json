@@ -13,7 +13,8 @@
       "Bash(done)",
       "Bash(curl -s *)",
       "Bash(exit 1)",
-      "Bash(ls *)"
+      "Bash(ls *)",
+      "Bash(rtk grep:*)"
     ]
   }
 }
