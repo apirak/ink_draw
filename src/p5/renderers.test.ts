@@ -21,6 +21,15 @@ function mockP(): any {
     ellipse: vi.fn(),
     line: vi.fn(),
     CLOSE: 'close',
+    drawingContext: {
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      closePath: vi.fn(),
+      clip: vi.fn(),
+      save: vi.fn(),
+      restore: vi.fn(),
+    },
   };
 }
 

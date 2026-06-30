@@ -40,9 +40,13 @@ function mockP(width = 0, height = 0): any {
     drawingContext: {
       beginPath: vi.fn(),
       moveTo: vi.fn(),
+      lineTo: vi.fn(),
       quadraticCurveTo: vi.fn(),
       closePath: vi.fn(),
       fill: vi.fn(),
+      clip: vi.fn(),
+      save: vi.fn(),
+      restore: vi.fn(),
       createRadialGradient: vi.fn(() => gradient()),
       createLinearGradient: vi.fn(() => gradient()),
     },

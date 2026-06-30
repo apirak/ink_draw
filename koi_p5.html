@@ -34,6 +34,40 @@
   <input type="range" id="sCount" min="1" max="110" step="1">
   <div class="foot">FOV = visible arc; 360° sees all, lower carves a rear blind spot. <span class="reset" id="tnReset">reset mode</span></div>
 </aside>
+
+<aside class="tuner koi-panel hidden" id="koi-panel" aria-label="Koi visual tuner">
+  <h4><span>Koi visual</span><span class="reset" id="koi-reset">reset</span></h4>
+
+  <label>Body alpha <span class="v" id="k-bodyA-v"></span></label>
+  <input type="range" id="k-bodyA" min="0" max="1" step="0.01">
+  <label>Patch alpha <span class="v" id="k-patchA-v"></span></label>
+  <input type="range" id="k-patchA" min="0" max="1" step="0.01">
+  <label>Sumi alpha <span class="v" id="k-sumiA-v"></span></label>
+  <input type="range" id="k-sumiA" min="0" max="1" step="0.01">
+  <label>Tail fin alpha <span class="v" id="k-tailA-v"></span></label>
+  <input type="range" id="k-tailA" min="0" max="1" step="0.01">
+  <label>Crown alpha <span class="v" id="k-crownA-v"></span></label>
+  <input type="range" id="k-crownA" min="0" max="1" step="0.01">
+  <label>Eye alpha <span class="v" id="k-eyeA-v"></span></label>
+  <input type="range" id="k-eyeA" min="0" max="1" step="0.01">
+  <label>Contour alpha <span class="v" id="k-contourA-v"></span></label>
+  <input type="range" id="k-contourA" min="0" max="1" step="0.01">
+  <label>Contour weight <span class="v" id="k-contourW-v"></span></label>
+  <input type="range" id="k-contourW" min="0" max="4" step="0.1">
+  <label>Patch scale <span class="v" id="k-patchScale-v"></span></label>
+  <input type="range" id="k-patchScale" min="0.3" max="2" step="0.05">
+  <label>Nose scale <span class="v" id="k-noseScale-v"></span></label>
+  <input type="range" id="k-noseScale" min="0.3" max="2" step="0.05">
+  <label>Crown scale <span class="v" id="k-crownScale-v"></span></label>
+  <input type="range" id="k-crownScale" min="0.3" max="2" step="0.05">
+  <label>Eye scale <span class="v" id="k-eyeScale-v"></span></label>
+  <input type="range" id="k-eyeScale" min="0.3" max="2" step="0.05">
+
+  <label>Dab stroke <span class="v" id="k-dabStroke-v"></span></label>
+  <input type="checkbox" id="k-dabStroke">
+
+  <div class="foot">Toggle this panel with <b>k</b> · flock tuner with <b>t</b></div>
+</aside>
   <script type="module" src="src/p5/main.ts"></script>
 </body>
 </html>

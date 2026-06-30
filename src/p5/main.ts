@@ -8,6 +8,7 @@ import { update } from '../physics';
 import { drawBird, drawHerd, drawKoi } from './renderers';
 import { paintTrail, stamps } from './trail';
 import { initTuner } from '../tuner';
+import { initKoiTuner } from './koi-tuner';
 import type { PointerState } from '../target';
 
 const DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -60,6 +61,7 @@ new p5((p: any) => {
     reseed(agents, mode, M);
     ptr.lastMove = -1e5;
     initTuner(mode, M, agents.length);
+    if (mode === 'koi') initKoiTuner();
 
     addEventListener('resize', resize);
   };

@@ -2,6 +2,23 @@ import { dab, stroke } from './brush';
 import type { Agent } from '../agents';
 import { INK, KOI_SUMI, SEPIA, type ColorFactory, type KoiVariety } from '../modes';
 
+// ponytail: runtime-tunable koi visual params; mutated by koi-tuner panel
+export const VIS = {
+  bodyA: 0.92,
+  patchA: 0.9,
+  sumiA: 0.55,
+  tailA: 0.4,
+  crownA: 0.85,
+  eyeA: 0.8,
+  contourA: 0.28,
+  contourW: 1,
+  patchScale: 1,
+  noseScale: 1,
+  crownScale: 1,
+  eyeScale: 1,
+  dabStroke: false,
+};
+
 export function drawBird(
   p: any,
   a: Agent,
@@ -104,16 +121,20 @@ export function drawKoi(
     p.endShape(p.CLOSE);
   };
 
-  p.fill(kind.body(alpha * 0.92));
+  p.fill(kind.body(alpha * VIS.bodyA));
   bodyPath();
 
-  p.push();
-  bodyPath();
-  // p.clip() not available in P2D graphics in some p5 versions; use mask on graphics if needed
-  // For parity, draw patches without clip for now
-  p.pop();
+  const dc = p.drawingContext;
+  dc.save();
+  dc.beginPath();
+  dc.moveTo(Lx[0], Ly[0]);
+  for (let i = 1; i < n; i++) dc.lineTo(Lx[i], Ly[i]);
+  for (let i = n - 1; i >= 0; i--) dc.lineTo(Rx[i], Ry[i]);
+  dc.closePath();
+  dc.clip();
 
-  p.fill(kind.patch(alpha * 0.9));
+  if (!VIS.dabStroke) p.noStroke();
+  p.fill(kind.patch(alpha * VIS.patchA));
   for (const [idx, scale, jit] of [
     [1, 1.05, 0.1],
     [3, 0.95, -0.18],
@@ -123,11 +144,11 @@ export function drawKoi(
     const p_ = h[Math.min(idx, n - 1)];
     if (!p_) continue;
     if (((a.koiSpots + idx * 0.17) % 1) > 0.72) continue;
-    dab(p, p_.x, p_.y, s * 0.34 * scale, s * 0.26 * scale, idx + jit);
+    dab(p, p_.x, p_.y, s * 0.34 * scale * VIS.patchScale, s * 0.26 * scale * VIS.patchScale, idx + jit);
   }
 
   if (kind.sumi) {
-    p.fill(KOI_SUMI(alpha * 0.55));
+    p.fill(KOI_SUMI(alpha * VIS.sumiA));
     for (const [idx, sc] of [
       [2, 0.18],
       [4, 0.15],
@@ -136,17 +157,18 @@ export function drawKoi(
       const p_ = h[Math.min(idx, n - 1)];
       if (!p_) continue;
       if (((a.koiSpots + idx * 0.31) % 1) > 0.55) continue;
-      dab(p, p_.x, p_.y, s * sc, s * sc * 0.9, idx);
+      dab(p, p_.x, p_.y, s * sc * VIS.patchScale, s * sc * 0.9 * VIS.patchScale, idx);
     }
   }
+  dc.restore();
 
-  p.stroke(INK(alpha * 0.28));
-  p.strokeWeight(1);
+  p.stroke(INK(alpha * VIS.contourA));
+  p.strokeWeight(VIS.contourW);
   bodyPath();
 
   p.noStroke();
-  p.fill(kind.body(alpha * 0.92));
-  dab(p, h[0].x, h[0].y, s * 0.15 * grow, s * 0.15 * grow, 0);
+  p.fill(kind.body(alpha * VIS.bodyA));
+  dab(p, h[0].x, h[0].y, s * 0.15 * grow * VIS.noseScale, s * 0.15 * grow * VIS.noseScale, 0);
 
   const head = h[0];
   const neck = h[2] || head;
@@ -154,7 +176,7 @@ export function drawKoi(
   const tail2 = h[n - 2] || tail;
 
   const ta = Math.atan2(tail.y - tail2.y, tail.x - tail2.x);
-  p.fill(kind.body(alpha * 0.4));
+  p.fill(kind.body(alpha * VIS.tailA));
   p.push();
   p.translate(tail.x, tail.y);
   p.rotate(ta);
@@ -171,13 +193,13 @@ export function drawKoi(
   p.pop();
 
   if (a.hasRed) {
-    p.fill(kind.patch(alpha * 0.85));
+    p.fill(kind.patch(alpha * VIS.crownA));
     const p_ = h[1] || head;
-    dab(p, p_.x, p_.y, s * 0.3, s * 0.22, na);
+    dab(p, p_.x, p_.y, s * 0.3 * VIS.crownScale, s * 0.22 * VIS.crownScale, na);
   }
 
-  p.fill(KOI_SUMI(alpha * 0.8));
-  dab(p, head.x, head.y, s * 0.2, s * 0.16, na);
+  p.fill(KOI_SUMI(alpha * VIS.eyeA));
+  dab(p, head.x, head.y, s * 0.2 * VIS.eyeScale, s * 0.16 * VIS.eyeScale, na);
 }
 
 export const SHD = { x: -0.38, y: -0.925 };
