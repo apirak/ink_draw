@@ -102,6 +102,8 @@ new p5((p: any) => {
   });
 
   let last = performance.now();
+  const koiPanel = document.getElementById('koi-panel');
+  const frozen: PointerState = { x: 0, y: 0, lastMove: -1e5, down: false };
 
   p.draw = () => {
     const t = performance.now();
@@ -111,7 +113,8 @@ new p5((p: any) => {
 
     morph = Math.min(morph + 0.022 * dt, 1);
 
-    update(t, dt, mode, M, agents, bounds, ptr, performance.now());
+    const activePtr = koiPanel && !koiPanel.classList.contains('hidden') ? frozen : ptr;
+    update(t, dt, mode, M, agents, bounds, activePtr, performance.now());
 
     p.clear();
     if (bgLayer) p.image(bgLayer, 0, 0, W, H);

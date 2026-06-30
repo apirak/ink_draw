@@ -36,37 +36,53 @@
 </aside>
 
 <aside class="tuner koi-panel hidden" id="koi-panel" aria-label="Koi visual tuner">
-  <h4><span>Koi visual</span><span class="reset" id="koi-reset">reset</span></h4>
+  <h4><span>Koi visual</span><span><span class="reset" id="koi-copy">copy</span> · <span class="reset" id="koi-reset">reset</span></span></h4>
 
-  <label>Body alpha <span class="v" id="k-bodyA-v"></span></label>
-  <input type="range" id="k-bodyA" min="0" max="1" step="0.01">
-  <label>Patch alpha <span class="v" id="k-patchA-v"></span></label>
-  <input type="range" id="k-patchA" min="0" max="1" step="0.01">
-  <label>Sumi alpha <span class="v" id="k-sumiA-v"></span></label>
-  <input type="range" id="k-sumiA" min="0" max="1" step="0.01">
-  <label>Tail fin alpha <span class="v" id="k-tailA-v"></span></label>
-  <input type="range" id="k-tailA" min="0" max="1" step="0.01">
-  <label>Crown alpha <span class="v" id="k-crownA-v"></span></label>
-  <input type="range" id="k-crownA" min="0" max="1" step="0.01">
-  <label>Eye alpha <span class="v" id="k-eyeA-v"></span></label>
-  <input type="range" id="k-eyeA" min="0" max="1" step="0.01">
-  <label>Contour alpha <span class="v" id="k-contourA-v"></span></label>
-  <input type="range" id="k-contourA" min="0" max="1" step="0.01">
-  <label>Contour weight <span class="v" id="k-contourW-v"></span></label>
-  <input type="range" id="k-contourW" min="0" max="4" step="0.1">
-  <label>Patch scale <span class="v" id="k-patchScale-v"></span></label>
-  <input type="range" id="k-patchScale" min="0.3" max="2" step="0.05">
-  <label>Nose scale <span class="v" id="k-noseScale-v"></span></label>
-  <input type="range" id="k-noseScale" min="0.3" max="2" step="0.05">
-  <label>Crown scale <span class="v" id="k-crownScale-v"></span></label>
-  <input type="range" id="k-crownScale" min="0.3" max="2" step="0.05">
-  <label>Eye scale <span class="v" id="k-eyeScale-v"></span></label>
-  <input type="range" id="k-eyeScale" min="0.3" max="2" step="0.05">
+  <div class="koi-grid">
+    <section class="koi-section">
+      <h5>Alpha <small>0 clear · 1 solid</small></h5>
+      <label>Body <span class="v" id="k-bodyA-v"></span></label>
+      <input type="range" id="k-bodyA" min="0" max="1" step="0.01">
+      <label>Patch <span class="v" id="k-patchA-v"></span></label>
+      <input type="range" id="k-patchA" min="0" max="1" step="0.01">
+      <label>Sumi <span class="v" id="k-sumiA-v"></span></label>
+      <input type="range" id="k-sumiA" min="0" max="1" step="0.01">
+      <label>Tail fin <span class="v" id="k-tailA-v"></span></label>
+      <input type="range" id="k-tailA" min="0" max="1" step="0.01">
+      <label>Crown <span class="v" id="k-crownA-v"></span></label>
+      <input type="range" id="k-crownA" min="0" max="1" step="0.01">
+      <label>Eye <span class="v" id="k-eyeA-v"></span></label>
+      <input type="range" id="k-eyeA" min="0" max="1" step="0.01">
+    </section>
 
-  <label>Dab stroke <span class="v" id="k-dabStroke-v"></span></label>
-  <input type="checkbox" id="k-dabStroke">
+    <section class="koi-section">
+      <h5>Contour <small>body outline</small></h5>
+      <label>Alpha <span class="v" id="k-contourA-v"></span></label>
+      <input type="range" id="k-contourA" min="0" max="1" step="0.01">
+      <label>Weight <span class="v" id="k-contourW-v"></span></label>
+      <input type="range" id="k-contourW" min="0" max="4" step="0.1">
 
-  <div class="foot">Toggle this panel with <b>k</b> · flock tuner with <b>t</b></div>
+      <h5 style="margin-top:14px">Scale <small>relative size</small></h5>
+      <label>Patch <span class="v" id="k-patchScale-v"></span></label>
+      <input type="range" id="k-patchScale" min="0.3" max="2" step="0.05">
+      <label>Nose <span class="v" id="k-noseScale-v"></span></label>
+      <input type="range" id="k-noseScale" min="0.3" max="2" step="0.05">
+      <label>Crown <span class="v" id="k-crownScale-v"></span></label>
+      <input type="range" id="k-crownScale" min="0.3" max="2" step="0.05">
+      <label>Eye <span class="v" id="k-eyeScale-v"></span></label>
+      <input type="range" id="k-eyeScale" min="0.3" max="2" step="0.05">
+      <label>Body width <small>อวบ</small> <span class="v" id="k-bodyWidth-v"></span></label>
+      <input type="range" id="k-bodyWidth" min="0.5" max="1.5" step="0.02">
+    </section>
+
+    <section class="koi-section koi-section--full">
+      <h5>Toggles</h5>
+      <label><input type="checkbox" id="k-dabStroke"> Dab stroke <span class="v" id="k-dabStroke-v"></span></label>
+      <label><input type="checkbox" id="k-patchSolid"> Patch solid <small>ignore body under</small> <span class="v" id="k-patchSolid-v"></span></label>
+    </section>
+  </div>
+
+  <div class="foot">Toggle this panel with <b>k</b> · flock tuner with <b>t</b> · mouse follow paused while open</div>
 </aside>
   <script type="module" src="src/p5/main.ts"></script>
 </body>

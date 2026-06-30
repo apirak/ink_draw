@@ -7,16 +7,18 @@ export const VIS = {
   bodyA: 0.92,
   patchA: 0.9,
   sumiA: 0.55,
-  tailA: 0.4,
+  tailA: 0.9,
   crownA: 0.85,
-  eyeA: 0.8,
-  contourA: 0.28,
+  eyeA: 0.5,
+  contourA: 0.1,
   contourW: 1,
-  patchScale: 1,
+  patchScale: 0.8,
   noseScale: 1,
   crownScale: 1,
-  eyeScale: 1,
+  eyeScale: 0.5,
+  bodyWidth: 1.2,
   dabStroke: false,
+  patchSolid: false,
 };
 
 export function drawBird(
@@ -106,7 +108,7 @@ export function drawKoi(
     let dx = o.x - q.x;
     let dy = o.y - q.y;
     const d = Math.hypot(dx, dy) || 1;
-    const w = s * 0.3 * KOI_PROFILE[i] * grow;
+    const w = s * 0.3 * KOI_PROFILE[i] * grow * VIS.bodyWidth;
     Lx.push(p_.x - (dy / d) * w);
     Ly.push(p_.y + (dx / d) * w);
     Rx.push(p_.x + (dy / d) * w);
@@ -134,7 +136,7 @@ export function drawKoi(
   dc.clip();
 
   if (!VIS.dabStroke) p.noStroke();
-  p.fill(kind.patch(alpha * VIS.patchA));
+  p.fill(kind.patch(VIS.patchSolid ? VIS.patchA : alpha * VIS.patchA));
   for (const [idx, scale, jit] of [
     [1, 1.05, 0.1],
     [3, 0.95, -0.18],
@@ -164,6 +166,7 @@ export function drawKoi(
 
   p.stroke(INK(alpha * VIS.contourA));
   p.strokeWeight(VIS.contourW);
+  p.noFill();
   bodyPath();
 
   p.noStroke();
@@ -199,7 +202,13 @@ export function drawKoi(
   }
 
   p.fill(KOI_SUMI(alpha * VIS.eyeA));
-  dab(p, head.x, head.y, s * 0.2 * VIS.eyeScale, s * 0.16 * VIS.eyeScale, na);
+  const eyeRx = s * 0.08 * VIS.eyeScale;
+  const eyeRy = s * 0.07 * VIS.eyeScale;
+  const perpX = Math.cos(na + Math.PI / 2);
+  const perpY = Math.sin(na + Math.PI / 2);
+  const eyeOff = s * 0.12;
+  dab(p, head.x + perpX * eyeOff, head.y + perpY * eyeOff, eyeRx, eyeRy, na);
+  dab(p, head.x - perpX * eyeOff, head.y - perpY * eyeOff, eyeRx, eyeRy, na);
 }
 
 export const SHD = { x: -0.38, y: -0.925 };

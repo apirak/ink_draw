@@ -14,13 +14,15 @@ const FIELDS: Array<{ key: keyof typeof VIS; type: 'range' | 'checkbox'; min?: n
   { key: 'noseScale', type: 'range', min: 0.3, max: 2, step: 0.05 },
   { key: 'crownScale', type: 'range', min: 0.3, max: 2, step: 0.05 },
   { key: 'eyeScale', type: 'range', min: 0.3, max: 2, step: 0.05 },
+  { key: 'bodyWidth', type: 'range', min: 0.5, max: 1.5, step: 0.02 },
   { key: 'dabStroke', type: 'checkbox' },
+  { key: 'patchSolid', type: 'checkbox' },
 ];
 
 const DEFAULTS = {
-  bodyA: 0.92, patchA: 0.9, sumiA: 0.55, tailA: 0.4, crownA: 0.85, eyeA: 0.8,
-  contourA: 0.28, contourW: 1, patchScale: 1, noseScale: 1, crownScale: 1, eyeScale: 1,
-  dabStroke: false,
+  bodyA: 0.92, patchA: 0.9, sumiA: 0.55, tailA: 0.9, crownA: 0.85, eyeA: 0.5,
+  contourA: 0.1, contourW: 1, patchScale: 0.8, noseScale: 1, crownScale: 1, eyeScale: 0.5, bodyWidth: 1.2,
+  dabStroke: false, patchSolid: false,
 };
 
 export function initKoiTuner(): void {
@@ -62,6 +64,21 @@ export function initKoiTuner(): void {
       if (f.type === 'checkbox') input.checked = d as boolean;
       else input.value = String(d);
       if (valEl) valEl.textContent = f.type === 'checkbox' ? (d ? 'on' : 'off') : (+d).toFixed(2);
+    }
+  });
+
+  document.getElementById('koi-copy')!.addEventListener('click', async () => {
+    const out: Record<string, number | boolean> = {};
+    for (const f of FIELDS) out[f.key] = VIS[f.key] as number | boolean;
+    const text = JSON.stringify(out, null, 2);
+    try {
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('koi-copy')!;
+      const old = btn.textContent;
+      btn.textContent = 'copied!';
+      setTimeout(() => { btn.textContent = old; }, 1200);
+    } catch {
+      console.log(text);
     }
   });
 
