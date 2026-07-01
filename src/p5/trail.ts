@@ -16,13 +16,12 @@ export interface TrailStamp {
 }
 
 let frame = 0;
-let g: any = null;
 export const stamps: TrailStamp[] = [];
 
 export function paintTrail(
   p: any,
-  W: number,
-  H: number,
+  _W: number,
+  _H: number,
   M: ModeConfig,
   agents: Agent[],
   mode: ModeName,
@@ -30,12 +29,6 @@ export function paintTrail(
   sepia: ColorFactory = SEPIA,
 ): void {
   frame++;
-
-  const sw = W;
-  const sh = H;
-  if (!g || g.width !== sw || g.height !== sh) {
-    g = p.createGraphics(sw, sh);
-  }
 
   for (let i = 0; i < M.count; i++) {
     const a = agents[i];
@@ -84,8 +77,7 @@ export function paintTrail(
     }
   }
 
-  g.clear();
-  g.noStroke();
+  p.noStroke();
   for (let i = stamps.length - 1; i >= 0; i--) {
     const s = stamps[i];
     s.age++;
@@ -95,9 +87,7 @@ export function paintTrail(
       continue;
     }
     const col = s.tint ? s.tint : s.sepia ? sepia : ink;
-    g.fill(col(s.a0 * f * (s.tint ? 0.7 : 1)));
-    dab(g, s.x, s.y, s.rx, s.ry, s.rot);
+    p.fill(col(s.a0 * f * (s.tint ? 0.7 : 1)));
+    dab(p, s.x, s.y, s.rx, s.ry, s.rot);
   }
-
-  p.image(g, 0, 0, W, H);
 }

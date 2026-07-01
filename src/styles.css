@@ -158,6 +158,12 @@
     width: 13px; height: 13px; border-radius: 50%;
     background: var(--vermilion); border: 2px solid var(--paper-birds);
   }
+  .tuner input[type=color] {
+    width: 100%; height: 28px; cursor: none; padding: 0; border: 1px solid rgba(31,34,38,.2);
+    background: transparent; border-radius: 3px;
+  }
+  .tuner input[type=color]::-webkit-color-swatch-wrapper { padding: 2px; }
+  .tuner input[type=color]::-webkit-color-swatch { border: none; border-radius: 2px; }
   .tuner .foot { margin-top: 12px; font-size: 10.5px; opacity: .42; font-style: italic; line-height: 1.5; }
   .tuner .reset { color: var(--vermilion); cursor: none; text-decoration: underline; opacity: .8; }
 

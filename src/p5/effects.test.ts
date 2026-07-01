@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { drawRipples } from './effects';
+import { bursts, drawBursts, drawRipples } from './effects';
 
 function mockP(): any {
   return {
@@ -7,6 +7,8 @@ function mockP(): any {
     strokeWeight: vi.fn(),
     noFill: vi.fn(),
     ellipse: vi.fn(),
+    image: vi.fn(),
+    tint: vi.fn(),
     push: vi.fn(),
     pop: vi.fn(),
   };
@@ -26,5 +28,23 @@ describe('drawRipples', () => {
     drawRipples(p, ripples);
     expect(p.ellipse).toHaveBeenCalled();
     expect(ripples.length).toBe(1);
+  });
+});
+
+describe('drawBursts', () => {
+  it('tint-blits a live burst and returns its slot to the pool when aged out', () => {
+    const remove = vi.fn();
+    bursts.length = 0;
+    bursts.push({ g: { remove }, ox: 5, oy: 6, age: 458, life: 460 });
+
+    const p = mockP();
+    drawBursts(p);
+    // live at f>0 last frame → blitted
+    expect(p.image).toHaveBeenCalledWith(expect.objectContaining({ remove }), 5, 6);
+    expect(bursts.length).toBe(1);
+
+    drawBursts(p); // age crosses life → dropped, buffer NOT removed (pooled)
+    expect(remove).not.toHaveBeenCalled();
+    expect(bursts.length).toBe(0);
   });
 });

@@ -1,5 +1,18 @@
+import * as brush from 'p5.brush';
 import type { Agent, RandomFn } from '../agents';
 import { INK, WATER_BLUE, type ColorFactory, type ModeName } from '../modes';
+
+// ponytail: blot snapshot pipeline — see docs/adr/0001-birds-click-blot-brush-snapshot.md
+// Runtime-tunable via #burst-panel (see burst-tuner wiring at bottom)
+export const BURST = {
+  hex: '#32240c', // blot color, paint-time (affects new clicks) — RGB(50,36,12) warm dark brown
+  life: 300, // fade frames @ 60fps = 5s
+};
+const BLOT_ALPHA = 55; // 0-255, brush.fill opacity — keep light so fade reads smooth
+const BLOT_R_MIN = 18;
+const BLOT_R_JITTER = 6;
+const BBOX = 120; // framebuffer edge; blot fits inside with margin for jitter + scatter
+const MAX_BURSTS = 5; // framebuffer pool size
 
 export interface Stamp {
   x: number;
@@ -27,6 +40,85 @@ export interface Ripple {
   tint?: ColorFactory;
 }
 
+export interface Burst {
+  g: any;
+  ox: number;
+  oy: number;
+  age: number;
+  life: number;
+}
+
+export const bursts: Burst[] = [];
+
+// ponytail: pre-warmed framebuffer pool — lives in the main WEBGL context
+// (no per-click GL context creation, no createGraphics hitch)
+const pool: any[] = [];
+let poolIdx = 0;
+let pInst: any = null; // captured at initBurstPool — fb.draw scope swaps p, so we call p.clear()
+
+export function initBurstPool(p: any): void {
+  if (pool.length > 0) return;
+  pInst = p;
+  for (let i = 0; i < MAX_BURSTS; i++) {
+    pool.push(p.createFramebuffer({ width: BBOX, height: BBOX }));
+  }
+}
+
+function pushBurst(x: number, y: number, rand: RandomFn): void {
+  if (pool.length === 0 || !pInst) return; // pool not initialized (non-birds mode) — no-op
+
+  const fb = pool[poolIdx];
+  poolIdx = (poolIdx + 1) % pool.length;
+
+  // recycle slot: drop any live burst pointing at the same framebuffer
+  for (let i = bursts.length - 1; i >= 0; i--) {
+    if (bursts[i].g === fb) bursts.splice(i, 1);
+  }
+
+  fb.draw(() => {
+    // inside draw(): pInst's renderer is swapped to the framebuffer — clear via p, not fb
+    pInst.clear();
+    brush.load(fb);
+    brush.scaleBrushes(2.5); // finer scale for the small blot framebuffer
+    brush.set('pen', BURST.hex, 2.5);
+    brush.noField();
+    brush.noStroke();
+    brush.fill(BURST.hex, BLOT_ALPHA);
+    brush.fillTexture(0.55, 0.45, true); // scatter = true for bleeding paintbrush ink edge
+    const r = BLOT_R_MIN + rand() * BLOT_R_JITTER;
+    const numPoints = 16;
+    const pts: [number, number][] = [];
+    for (let i = 0; i < numPoints; i++) {
+      const angle = (i / numPoints) * Math.PI * 2;
+      // jitter radius to simulate realistic paintbrush press and ink bleeding
+      const pr = r * (0.85 + rand() * 0.3);
+      pts.push([Math.cos(angle) * pr, Math.sin(angle) * pr]);
+    }
+    brush.polygon(pts);
+    brush.scaleBrushes(6); // restore global scale for background mountains
+    brush.load();
+  });
+
+  bursts.push({ g: fb, ox: x - BBOX / 2, oy: y - BBOX / 2, age: 0, life: BURST.life });
+}
+
+export function drawBursts(p: any): void {
+  for (let i = bursts.length - 1; i >= 0; i--) {
+    const b = bursts[i];
+    b.age++;
+    const f = 1 - b.age / b.life;
+    if (f <= 0) {
+      bursts.splice(i, 1); // framebuffer returns to pool; do not remove()
+      continue;
+    }
+    p.push();
+    // explicit RGBA tint: white = identity multiplier, alpha fades neutrally
+    p.tint(255, 255, 255, f * 255);
+    p.image(b.g, b.ox, b.oy);
+    p.pop();
+  }
+}
+
 export function inkBurst(
   x: number,
   y: number,
@@ -52,17 +144,23 @@ export function inkBurst(
     }
   }
 
-  stamps.push({
-    x,
-    y,
-    rx: 16 + rand() * 9,
-    ry: 13 + rand() * 8,
-    rot: rand() * 3,
-    a0: 0.3,
-    age: 0,
-    life: 460,
-    sepia: mode === 'herd',
-  });
+  if (mode === 'birds') {
+    // blot: watercolor brush snapshot, fades via drawBursts tint-blit
+    pushBurst(x, y, rand);
+  } else {
+    // herd: legacy ellipse big stamp
+    stamps.push({
+      x,
+      y,
+      rx: 16 + rand() * 9,
+      ry: 13 + rand() * 8,
+      rot: rand() * 3,
+      a0: 0.3,
+      age: 0,
+      life: 460,
+      sepia: true,
+    });
+  }
 
   for (let i = 0; i < 12; i++) {
     const ang = rand() * Math.PI * 2;
@@ -156,4 +254,45 @@ export function drawRipples(
     p.noFill();
     p.ellipse(R.x, R.y, R.r * 2, R.r * 2 * (R.wob ?? 0.62));
   }
+}
+
+// ponytail: tuner wiring — DOM inputs in #burst-panel mutate BURST runtime state.
+// Color applies to new clicks (paint-time). Life applies to existing bursts (blit-time).
+export function initBurstTuner(): void {
+  const panel = document.getElementById('burst-panel');
+  if (!panel) return;
+
+  const colorEl = document.getElementById('bColor') as HTMLInputElement | null;
+  const lifeEl = document.getElementById('bLife') as HTMLInputElement | null;
+  const lifeVal = document.getElementById('bLife-v');
+  const resetEl = document.getElementById('bReset');
+
+  const syncLife = () => {
+    if (!lifeEl) return;
+    BURST.life = +lifeEl.value;
+    if (lifeVal) lifeVal.textContent = (BURST.life / 60).toFixed(1) + 's';
+  };
+
+  if (colorEl) {
+    colorEl.value = BURST.hex;
+    colorEl.addEventListener('input', () => { BURST.hex = colorEl.value; });
+  }
+  if (lifeEl) {
+    lifeEl.value = String(BURST.life);
+    lifeEl.addEventListener('input', syncLife);
+    syncLife();
+  }
+  if (resetEl) {
+    resetEl.addEventListener('click', () => {
+      BURST.hex = '#32240c';
+      BURST.life = 300;
+      if (colorEl) colorEl.value = BURST.hex;
+      if (lifeEl) lifeEl.value = String(BURST.life);
+      syncLife();
+    });
+  }
+
+  addEventListener('keydown', (e) => {
+    if (e.key === 'b' || e.key === 'B') panel.classList.toggle('hidden');
+  });
 }

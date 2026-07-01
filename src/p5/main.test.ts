@@ -69,6 +69,7 @@ function mockP(width = 0, height = 0): any {
     frameRate: vi.fn(),
     pixelDensity: vi.fn(),
     resizeCanvas: vi.fn(),
+    createFramebuffer: vi.fn(() => ({ draw: vi.fn((cb: any) => cb()), clear: vi.fn() })),
     drawingContext: {
       beginPath: vi.fn(),
       moveTo: vi.fn(),
@@ -143,7 +144,6 @@ describe('p5 main', () => {
     const backgroundLayer = graphics.find((g) => g.width === 1024 && g.height === 768);
     expect(backgroundLayer).toBeTruthy();
     expect(instance.image.mock.calls[0]).toEqual([backgroundLayer, 0, 0, 1024, 768]);
-    expect(instance.image.mock.calls[1][0].width).toBe(1024);
-    expect(instance.image.mock.calls[1][0].height).toBe(768);
+    expect(instance.image.mock.calls.length).toBe(1);
   });
 });

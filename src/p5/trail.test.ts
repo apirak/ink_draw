@@ -4,20 +4,14 @@ import { MODES } from '../modes';
 import { paintTrail, stamps } from './trail';
 
 function mockP(): any {
-  const g = {
-    clear: vi.fn(),
-    ellipse: vi.fn(),
-    fill: vi.fn(),
+  return {
     noStroke: vi.fn(),
+    fill: vi.fn(),
     push: vi.fn(),
     pop: vi.fn(),
     translate: vi.fn(),
     rotate: vi.fn(),
-  };
-  return {
-    createGraphics: vi.fn(() => g),
-    image: vi.fn(),
-    g,
+    ellipse: vi.fn(),
   };
 }
 
@@ -26,14 +20,12 @@ describe('paintTrail', () => {
     stamps.length = 0;
   });
 
-  it('creates a full-size graphics buffer and clears it each frame', () => {
+  it('calls noStroke on the main canvas', () => {
     const p = mockP();
     const agents: any[] = [];
     paintTrail(p, 800, 600, MODES.birds, agents, 'birds');
 
-    expect(p.createGraphics).toHaveBeenCalledWith(800, 600);
-    expect(p.g.clear).toHaveBeenCalled();
-    expect(p.image).toHaveBeenCalled();
+    expect(p.noStroke).toHaveBeenCalled();
   });
 
   it('ages out dead stamps', () => {
@@ -52,7 +44,7 @@ describe('paintTrail', () => {
     expect(stamps.length).toBe(0);
   });
 
-  it('keeps live stamps and paints them', () => {
+  it('keeps live stamps and paints them directly on the main canvas', () => {
     const p = mockP();
     const a = makeAgent(0, 'birds', { w: 800, h: 600 });
     a.size = 10;
@@ -61,6 +53,6 @@ describe('paintTrail', () => {
     paintTrail(p, 800, 600, MODES.birds, agents, 'birds');
 
     expect(stamps.length).toBeGreaterThan(0);
-    expect(p.g.ellipse).toHaveBeenCalled();
+    expect(p.ellipse).toHaveBeenCalled();
   });
 });

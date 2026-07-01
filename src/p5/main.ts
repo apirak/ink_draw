@@ -3,7 +3,7 @@ import * as brush from 'p5.brush';
 import type { Agent } from '../agents';
 import { makeAgent, reseed } from '../agents';
 import { drawBackground } from './background';
-import { drawRipples, inkBurst } from './effects';
+import { drawBursts, drawRipples, initBurstPool, initBurstTuner, inkBurst } from './effects';
 import { MODES, type ModeConfig, type ModeName } from '../modes';
 import { update } from '../physics';
 import { drawBird, drawHerd, drawKoi } from './renderers';
@@ -71,6 +71,11 @@ new p5((p: any) => {
     bounds.w = W;
     bounds.h = H;
     redrawBackground();
+    // ponytail: pre-warm WEBGL burst buffers — otherwise per-click createGraphics hitches the main thread
+    if (mode === 'birds') {
+      initBurstPool(p);
+      initBurstTuner();
+    }
 
     for (let i = 0; i < MAX; i++) agents.push(makeAgent(i, mode, bounds));
     reseed(agents, mode, M);
@@ -137,6 +142,7 @@ new p5((p: any) => {
     p.clear();
     if (bgLayer) p.image(bgLayer, 0, 0, W, H);
     paintTrail(p, W, H, M, agents, mode);
+    drawBursts(p);
     drawRipples(p, ripples);
 
     const order = agents.slice(0, M.count);

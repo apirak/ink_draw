@@ -34,6 +34,15 @@
   <input type="range" id="sCount" min="1" max="110" step="1">
   <div class="foot">FOV = visible arc; 360° sees all, lower carves a rear blind spot. <span class="reset" id="tnReset">reset mode</span></div>
 </aside>
+
+<aside class="tuner hidden" id="burst-panel" aria-label="Ink burst tuner" style="right:auto;left:28px;">
+  <h4><span>Ink burst</span><span class="m">blot</span></h4>
+  <label>Color</label>
+  <input type="color" id="bColor" value="#32240c">
+  <label>Fade time <span class="v" id="bLife-v"></span></label>
+  <input type="range" id="bLife" min="60" max="1500" step="20" value="300">
+  <div class="foot">Press <b>B</b> to toggle. Color applies to new clicks; fade applies to live blots. <span class="reset" id="bReset">reset</span></div>
+</aside>
   <script type="module" src="src/p5/main.ts"></script>
 </body>
 </html>
